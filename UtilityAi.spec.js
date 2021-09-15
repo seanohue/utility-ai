@@ -1,8 +1,8 @@
 const { expect } = require("chai")
-const UtilityAi = require("./UtilityAi")
+const { UtilityAi } = require("./UtilityAi")
 
 describe("UtilityAi", () => {
-
+  console.log({UtilityAi})
   it("is a function", () => {
     expect(UtilityAi).to.be.a("function")
     expect(new UtilityAi).to.be.an("object")

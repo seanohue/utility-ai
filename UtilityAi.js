@@ -1,99 +1,96 @@
-class Action {
-
-  constructor(description, callback) {
-    this.description = description
-    this._scores = []
-    this._condition = () => true
-
-    callback(this)
-  }
-
-  condition(callback) {
-    if (!callback) {
-      throw Error("UtilityAi#Action#condition: Missing callback")
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UtilityAi = void 0;
+var Action = /** @class */ (function () {
+    function Action(description, callback) {
+        this.description = description;
+        this._scores = [];
+        this._condition = function () { return true; };
+        callback(this);
     }
-
-    this._condition = callback
-  }
-
-  score(description, callback) {
-
-    if (!description) {
-      throw Error("UtilityAi#Action#score: Missing description")
+    Action.prototype.condition = function (callback) {
+        if (!callback) {
+            throw Error("UtilityAi#Action#condition: Missing callback");
+        }
+        this._condition = callback;
+    };
+    Action.prototype.score = function (description, callback) {
+        if (!description) {
+            throw Error("UtilityAi#Action#score: Missing description");
+        }
+        if (!callback) {
+            throw Error("UtilityAi#Action#score: Missing callback");
+        }
+        this._scores.push({
+            description: description,
+            callback: callback
+        });
+    };
+    Action.prototype._validateScore = function (score) {
+        if (!isNaN(score) && typeof score === "number") {
+            return score;
+        }
+        return 0;
+    };
+    Action.prototype.log = function () {
+        var msg = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            msg[_i] = arguments[_i];
+        }
+        if (!this._print_debug)
+            return;
+        console.log.apply(console, msg);
+    };
+    Action.prototype.evaluate = function (data, debug) {
+        var _this = this;
+        if (debug === void 0) { debug = false; }
+        this._print_debug = debug;
+        this.log("Evaluate Action: ", this.description);
+        if (!this._condition(data)) {
+            this.log("Condition not fulfilled");
+            return -Infinity;
+        }
+        var score = this._scores
+            .map(function (score) {
+            var _score = _this._validateScore(score.callback(data));
+            _this.log("- ", score.description, _score);
+            return _score;
+        })
+            .reduce(function (acc, score) { return acc + score; }, 0);
+        this.log("Final Score: ", score);
+        return score;
+    };
+    return Action;
+}());
+var UtilityAi = /** @class */ (function () {
+    function UtilityAi() {
+        this._actions = [];
     }
-    if (!callback) {
-      throw Error("UtilityAi#Action#score: Missing callback")
-    }
-
-    this._scores.push({
-      description,
-      callback
-    })
-
-  }
-
-  _validateScore(score) {
-    if (!isNaN(score) && typeof score === "number") {
-      return score
-    }
-    return 0
-  }
-
-  log(...msg) {
-    if (!this._print_debug) return
-    console.log(...msg)
-  }
-
-  evaluate(data, debug = false) {
-    this._print_debug = debug
-
-    this.log("Evaluate Action: ", this.description)
-    if (!this._condition(data)) {
-      this.log("Condition not fulfilled")
-      return -Infinity
-    }
-
-    const score = this._scores
-      .map(score => {
-        const _score = this._validateScore(score.callback(data))
-        this.log("- ", score.description, _score)
-        return _score
-      })
-      .reduce((acc, score) => acc + score, 0)
-
-    this.log("Final Score: ", score)
-
-    return score
-  }
-
-}
-
-module.exports = class UtilityAi {
-
-  constructor() {
-    this._actions = []
-  }
-
-  addAction(description, callback) {
-    if (!description) {
-      throw Error("UtilityAi#addAction: Missing description")
-    }
-    if (!callback) {
-      throw Error("UtilityAi#addAction: Missing callback")
-    }
-
-    const action = new Action(description, callback)
-
-    this._actions.push(action)
-  }
-
-  evaluate(data, debug = false) {
-    return this._actions
-      .map(action => ({
-        action: action.description,
-        score: action.evaluate(data, debug)
-      }))
-      .reduce((acc, action) => acc.score !== undefined && acc.score > action.score ? acc : action, {})
-  }
-
-}
+    UtilityAi.prototype.addAction = function (description, callback) {
+        if (!description) {
+            throw Error("UtilityAi#addAction: Missing description");
+        }
+        if (!callback) {
+            throw Error("UtilityAi#addAction: Missing callback");
+        }
+        var action = new Action(description, callback);
+        this._actions.push(action);
+    };
+    UtilityAi.prototype.evaluate = function (data, debug) {
+        if (debug === void 0) { debug = false; }
+        return this._actions
+            .map(function (action) { return ({
+            action: action.description,
+            score: action.evaluate(data, debug)
+        }); })
+            .reduce(function (acc, action) {
+            return acc.score !== undefined && acc.score > action.score
+                ? acc
+                : action;
+        }, { score: undefined });
+    };
+    return UtilityAi;
+}());
+exports.UtilityAi = UtilityAi;
+exports.default = UtilityAi;
+//# sourceMappingURL=UtilityAi.js.map

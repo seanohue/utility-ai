@@ -1,9 +1,10 @@
+# Utility AI TypeScript
+
 [![Build Status](https://travis-ci.org/exane/utility-ai.svg?branch=master)](https://travis-ci.org/exane/utility-ai)
 [![npm version](https://badge.fury.io/js/utility-ai.svg)](https://badge.fury.io/js/utility-ai)
 
 ---
 
-# Utility Ai
 
 ## A small Utility Ai Framework
 
