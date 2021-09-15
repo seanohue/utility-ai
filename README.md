@@ -5,7 +5,6 @@
 
 ---
 
-
 ## A small Utility Ai Framework
 
 ### Install
@@ -15,10 +14,26 @@ npm install utility-ai
 yarn add utility-ai
 ```
 
+### Note of breaking change
+
+There is one breaking change if you choose to use this fork over the non-TypeScript fork. Imports have changed if you still use `require`:
+
+```js
+// Works now:
+const { UtilityAi } = require('utility-ai');
+
+// Does not work anymore:
+const UtilityAi = require('utility-ai');s
+
+// Both work
+import UtilityAi from 'utility-ai';
+import { UtilityAi } from 'utility-ai';
+```
+
 ### Usage
 
 ```js
-  const UtilityAi = require("utility-ai")
+  const { UtilityAi } = require("utility-ai")
 
   utility_ai = new UtilityAi
 
