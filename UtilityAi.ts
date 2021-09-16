@@ -1,13 +1,24 @@
-class Action {
+
+interface IScoreEvaluator<T = any> {
+  callback: (data: T) => number;
+  description: Action['description'];
+}
+
+interface IScoreEvaluation {
+  score: number;
+  action: Action['description'];
+}
+
+class Action<T = any> {
   description: string;
 
-  private _scores: any[];
-  private _condition: (data: any) => boolean;
+  private _scores: IScoreEvaluator<T>[];
+  private _condition: (data: T) => boolean;
   private _print_debug: boolean;
 
   constructor(
-    description: string, 
-    callback: (action: Action) => unknown
+    description: string,
+    callback: (action: Action<T>) => unknown
   ) {
     this.description = description
     this._scores = []
@@ -27,8 +38,8 @@ class Action {
   }
 
   score(
-    description: string, 
-    callback: () => unknown
+    description: string,
+    callback: IScoreEvaluator['callback']
   ) {
     if (!description) {
       throw Error("UtilityAi#Action#score: Missing description")
@@ -40,7 +51,7 @@ class Action {
 
     this._scores.push({
       description,
-      callback
+      callback,
     })
   }
 
@@ -57,7 +68,7 @@ class Action {
   }
 
   evaluate(
-    data: any,
+    data: T,
     debug = false
   ) {
     this._print_debug = debug
@@ -83,15 +94,15 @@ class Action {
 
 }
 
-export class UtilityAi {
-  private _actions: Action[];
+export class UtilityAi<T = any> {
+  private _actions: Action<T>[];
   constructor() {
     this._actions = []
   }
 
   addAction(
-    description: Action['description'], 
-    callback: (action: Action) => unknown,
+    description: Action<T>['description'],
+    callback: (action: Action<T>) => unknown,
   ) {
     if (!description) {
       throw Error("UtilityAi#addAction: Missing description")
@@ -100,23 +111,23 @@ export class UtilityAi {
       throw Error("UtilityAi#addAction: Missing callback")
     }
 
-    const action = new Action(description, callback)
+    const action = new Action<T>(description, callback)
 
     this._actions.push(action)
   }
 
-  evaluate(data: any, debug = false) {
+  evaluate(data: T, debug = false) {
     return this._actions
       .map(action => ({
         action: action.description,
         score: action.evaluate(data, debug)
-      }))
+      } as IScoreEvaluation))
       .reduce(
-        (acc, action) => 
-          acc.score !== undefined && acc.score > action.score 
-            ? acc 
-            : action, 
-        { score: undefined })
+        (acc, action) =>
+          acc.score !== undefined && acc.score > action.score
+            ? acc
+            : action,
+        { score: undefined } as IScoreEvaluation)
   }
 }
 
