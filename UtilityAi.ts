@@ -39,7 +39,7 @@ class Action<T = any> {
 
   score(
     description: string,
-    callback: IScoreEvaluator['callback']
+    callback: IScoreEvaluator<T>['callback']
   ) {
     if (!description) {
       throw Error("UtilityAi#Action#score: Missing description")
