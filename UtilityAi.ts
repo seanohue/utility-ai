@@ -1,6 +1,6 @@
 
 interface IScoreEvaluator<T = any> {
-  callback: (data: T) => number;
+  callback: (data: T) => number | false;
   description: Action['description'];
 }
 
@@ -55,8 +55,8 @@ class Action<T = any> {
     })
   }
 
-  _validateScore(score?: number) {
-    if (!isNaN(score) && typeof score === "number") {
+  _validateScore(score?: number | false): number {
+    if (!isNaN(score as number) && typeof score === "number") {
       return score
     }
     return 0
